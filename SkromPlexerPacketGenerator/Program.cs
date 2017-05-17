@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -10,12 +11,28 @@ namespace SkromPlexerPacketGenerator
 {
     class Program
     {
+        public static void LoadLocalDLL()
+        {
+            string[] files = Directory.GetFiles(".");
+
+            foreach (string file in files)
+            {
+                if (file.Contains(".dll"))
+                {
+                    Assembly.LoadFrom(file);
+                }
+            }
+        }
+
         static void Main(string[] args)
         {
             List<FileCreator> files = new List<FileCreator>();
 
             try
             {
+
+                LoadLocalDLL();
+                
                 Assembly assembly = Assembly.LoadFrom(args[0]);
                 foreach (Type type in assembly.GetTypes())
                 {
@@ -47,10 +64,11 @@ namespace SkromPlexerPacketGenerator
 
                 Console.Write("Done !");
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 Console.WriteLine("Impossible to generate the files, check the argument");
-                
+                Console.WriteLine(e.StackTrace);
+                throw e;
             }
         }
     }
